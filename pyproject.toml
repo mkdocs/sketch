@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling", "hatch-fancy-pypi-readme"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mkdocs"
+description = "MkDocs is a simple & elegant static site generator."
+version = "1.0"
+license = "BSD-3-Clause"
+requires-python = ">=3.10"
+classifiers = [
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "markdown",
+    "jinja2",
+    "click",
+    "uvicorn",
+    "starlette",
+    "markdown_gfm_admonition",
+    "mdx_linkify",
+    "awesome-slugify",
+]
+
+[project.scripts]
+mkdocs = "mkdocs:cli"

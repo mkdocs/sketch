@@ -1,0 +1,88 @@
+body { font-family: 'Inter', sans-serif; }
+@supports (font-variation-settings: normal) {
+  body { font-family: 'Inter var', sans-serif; }
+}
+
+pre code {
+  font-size: 0.8rem;
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  background: #f3f3f3;
+  display: block;
+  padding: 1em;
+}
+
+code {
+  color: #800;
+}
+
+main img {
+  max-width: 100%;
+}
+
+div .bd-toc-link {
+  font-weight: 300;
+}
+
+div .bd-toc-link.active {
+  font-weight: 600;
+}
+
+div .bd-toc-children {
+  margin-left: 1rem;
+  font-size: 15px;
+}
+
+main h1, main h2, main h3, main h4, main h5, main h6 {
+  font-weight: 300;
+}
+
+div.admonition {
+  border-left: 5px solid black;
+  padding: 8px 0 8px 16px;
+  margin-bottom: 16px;
+}
+
+div.admonition p:last-child {
+  margin-bottom: 0;
+}
+
+div.admonition.note {
+  border-left: 5px solid rgb(9, 105, 218);
+}
+
+div.admonition.note p.admonition-title {
+  color: rgb(9, 105, 218);
+}
+
+div.admonition.tip {
+  border-left: 5px solid rgb(26, 127, 55);
+}
+
+div.admonition.tip p.admonition-title {
+  color: rgb(26, 127, 55);
+}
+
+div.admonition.important {
+  border-left: 5px solid rgb(130, 80, 223);
+}
+
+div.admonition.important p.admonition-title {
+  color: rgb(130, 80, 223);
+}
+
+div.admonition.warning {
+  border-left: 5px solid rgb(191, 135, 0);
+}
+
+div.admonition.warning p.admonition-title {
+  color: rgb(191, 135, 0);
+}
+
+div.admonition.caution {
+  border-left: 5px solid rgb(207, 34, 46);
+}
+
+div.admonition.caution p.admonition-title {
+  color: rgb(207, 34, 46);
+}
