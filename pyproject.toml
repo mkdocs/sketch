@@ -27,6 +27,7 @@ dependencies = [
     "markdown_gfm_admonition",
     "mdx_linkify",
     "awesome-slugify",
+    "pyyaml",
 ]
 
 [project.scripts]
