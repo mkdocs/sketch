@@ -135,7 +135,7 @@ class NavItem:
     def __repr__(self) -> str:
         if self.children:
             return f"NavItem({self.title!r}, children={self.children!r})"
-        return f"NavItem({self.title!r})"    
+        return f"NavItem({self.title!r})"
 
 
 # Site
