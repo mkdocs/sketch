@@ -4,7 +4,7 @@ from typing import List
 
 from .base import Handler
 from ..site import File, Files, Site
-from ..utils import list_files_within_directory, make_parent_directories, url_for_path
+from ..utils import list_files_within_directory, url_for_path
 
 from starlette.routing import Route
 from starlette.responses import FileResponse
@@ -44,8 +44,14 @@ class StaticFilesHandler(Handler):
         path = os.path.join(self._build_dir, file.path)
 
         print(f'Copy {source!r} -> {path!r}')
-        make_parent_directories(path)
+        self._make_parent_directories(path)
         shutil.copy(source, path)
+
+    def _make_parent_directories(self, path: str) -> None:
+        """
+        Create all parent directories to the given path, if they do not yet exist.
+        """
+        os.makedirs(os.path.dirname(path), exist_ok=True)
 
     def _route_for_file(self, file: File) -> Route:
         source = os.path.join(self._statics_dir, file.path)
