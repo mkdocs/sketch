@@ -41,13 +41,12 @@ class PagesHandler:
 
     def initialize(self, site: Site) -> None:
         pages = []
-        for source_path in list_files_within_directory(self._docs_dir):
-            path = self._build_path(source_path)
-            url = url_for_path(path, base_url=self._base_url)
+        for path in list_files_within_directory(self._docs_dir):
+            output_path = self._build_path(path)
+            url = url_for_path(output_path, base_url=self._base_url)
             page = Page(
                 url=url,
                 path=path,
-                source_path=source_path,
                 context={},
                 sections=[]
             )
@@ -134,9 +133,12 @@ class PagesHandler:
         return os.path.join(dirname, root, 'index.html')
 
     def _build_page(self, page: Page, site: Site, template_env: jinja2.Environment, markdown_env: markdown.Markdown) -> None:
-        print(f'Build {page.source_path!r} -> {page.path!r}')
-        input_path = os.path.join(self._docs_dir, page.source_path)
-        output_path = os.path.join(self._build_dir, page.path)
+        input_rel_path = page.path
+        output_rel_path = self._build_path(input_rel_path)
+
+        print(f'Build {input_rel_path!r} -> {output_rel_path!r}')
+        input_path = os.path.join(self._docs_dir, input_rel_path)
+        output_path = os.path.join(self._build_dir, output_rel_path)
 
         with open(input_path, "r") as input_file:
             input_text = input_file.read()
@@ -155,7 +157,7 @@ class PagesHandler:
             output_file.write(output_text)
 
     def _route_for_page(self, state: BuildState, page: Page, site: Site, template_env: jinja2.Environment, markdown_env: markdown.Markdown) -> Route:
-        source = os.path.join(self._docs_dir, page.source_path)
+        source = os.path.join(self._docs_dir, page.path)
         endpoint = PageEndpoint(source, state, page, site, template_env, markdown_env)
         route = Route(page.url, endpoint=endpoint, methods=['GET'])
         return route

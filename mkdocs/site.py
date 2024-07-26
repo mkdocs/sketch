@@ -63,8 +63,6 @@ class Page:
     url: str
     path: str
 
-    source_path: str
-
     context: dict = field(default_factory=dict)
     sections: list["Section"] = field(default_factory=list)
     navigation: Optional["NavItem"] = None
@@ -74,7 +72,7 @@ class Page:
         return self.url == "/"
 
     def __repr__(self) -> str:
-        return f"Page({self.source_path!r})"
+        return f"Page({self.path!r})"
 
 
 @dataclass
