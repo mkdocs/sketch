@@ -1,16 +1,15 @@
 import os
 from contextlib import contextmanager
-from typing import Iterator, List
+from typing import Iterator, List, Optional
 
+
+import flask
 import jinja2
 import markdown
 import markdown_gfm_admonition
 from mdx_linkify.mdx_linkify import LinkifyExtension
 import slugify
 import xml.etree.ElementTree as etree
-
-from starlette.responses import HTMLResponse
-from starlette.routing import Route
 
 from ..site import Pages, Page, Section, Site
 from ..utils import list_files_within_directory, url_for_path
@@ -63,15 +62,15 @@ class PagesHandler:
             with state.active_page(page):
                 self._build_page(page, site, template_env, markdown_env)
 
-    def routes(self, site: Site) -> List[Route]:
-        routes: list[Routes] = []
+    def serve(self, site: Site, url: str) -> Optional[flask.Response]:
+        page = site.pages.lookup_url(url)
+        if page is None:
+            return None
+
         state = BuildState()
         template_env = self._setup_template_env(site)
         markdown_env = self._setup_markdown_env(site, state)
-        for page in site.pages:
-            route = self._route_for_page(state, page, site, template_env, markdown_env)
-            routes.append(route)
-        return routes
+        return self._serve_page(state, page, site, template_env, markdown_env)
 
     # ...
 
@@ -156,38 +155,23 @@ class PagesHandler:
         with open(output_path, "w") as output_file:
             output_file.write(output_text)
 
-    def _route_for_page(self, state: BuildState, page: Page, site: Site, template_env: jinja2.Environment, markdown_env: markdown.Markdown) -> Route:
+    def _serve_page(self, state: BuildState, page: Page, site: Site, template_env: jinja2.Environment, markdown_env: markdown.Markdown) -> flask.Response:
         source = os.path.join(self._docs_dir, page.path)
-        endpoint = PageEndpoint(source, state, page, site, template_env, markdown_env)
-        route = Route(page.url, endpoint=endpoint, methods=['GET'])
-        return route
 
-
-class PageEndpoint:
-    def __init__(self, source: str, state: BuildState, page: Page, site: Site, template_env: jinja2.Environment, markdown_env: markdown.Markdown) -> None:
-        self.source = source
-        self.state = state
-        self.page = page
-        self.site = site
-        self.template_env = template_env
-        self.markdown_env = markdown_env
-
-    async def __call__(self, scope, receive, send) -> None:
-        with open(self.source, "r") as input_file:
+        with open(source, "r") as input_file:
             input_text = input_file.read()
 
-        with self.state.active_page(self.page):
-            self.page.text = input_text
-            self.page.html = self.markdown_env.convert(input_text)
+        with state.active_page(page):
+            page.text = input_text
+            page.html = markdown_env.convert(input_text)
 
-            template = self.template_env.get_template("base.html")
+            template = template_env.get_template("base.html")
             content = template.render({
-                "site": self.site,
-                "page": self.page
+                "site": site,
+                "page": page
             })
 
-        response = HTMLResponse(content)
-        await response(scope, receive, send)
+        return flask.make_response(content)
 
 
 class _URLsProcessor(markdown.treeprocessors.Treeprocessor):
@@ -220,7 +204,7 @@ class _URLsProcessor(markdown.treeprocessors.Treeprocessor):
         current_directory = os.path.dirname(current_page.path)
 
         referenced_path = os.path.normpath(os.path.join(current_directory, url_or_path))
-        referenced_page = self._site.pages.lookup(path=referenced_path)
+        referenced_page = self._site.pages.lookup_path(referenced_path)
         if referenced_page is None:
             return "#"
         return referenced_page.url

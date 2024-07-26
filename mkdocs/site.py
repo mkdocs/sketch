@@ -16,6 +16,12 @@ class Files:
     #         if page.path == path:
     #             return page
 
+    def lookup_url(self, url: str) -> Optional["File"]:
+        for file in self.all:
+            if file.url == url:
+                return file
+        return None
+
     def __iter__(self) -> Iterator["File"]:
         return iter(self.all)
 
@@ -41,7 +47,13 @@ class File:
 class Pages:
     all: list["Page"] = field(default_factory=list)
 
-    def lookup(self, path: str) -> Optional["Page"]:
+    def lookup_url(self, url: str) -> Optional["Page"]:
+        for page in self.all:
+            if page.url == url:
+                return page
+        return None
+
+    def lookup_path(self, path: str) -> Optional["Page"]:
         for page in self.all:
             if page.path == path:
                 return page

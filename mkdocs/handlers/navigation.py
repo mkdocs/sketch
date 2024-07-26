@@ -1,7 +1,7 @@
 from .base import Handler
 from ..site import Navigation, NavItem, Pages, Site
 from typing import List, Optional, Tuple
-from starlette.routing import Route
+import flask
 
 
 class NavigationHandler(Handler):
@@ -15,8 +15,8 @@ class NavigationHandler(Handler):
     def build(self, site: Site) -> None:
         pass
 
-    def routes(self, site: Site) -> List[Route]:
-        return []
+    def serve(self, site: Site, url: str) -> Optional[flask.Response]:
+        pass
 
     # ...
 
@@ -46,7 +46,7 @@ class NavigationHandler(Handler):
                 _, current = self._load_navigation(value, pages, level + 1, parent=header, current=current)
             elif isinstance(value, str):
                 # TODO: error if page does not exist.
-                referenced = pages.lookup(value)
+                referenced = pages.lookup_path(value)
                 url = '' if referenced is None else referenced.url
 
                 nav = NavItem(
