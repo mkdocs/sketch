@@ -19,7 +19,7 @@ from ..utils import list_files_within_directory, url_for_path
 class BuildState:
     @contextmanager
     def active_page(self, page: Page) -> Iterator[None]:
-        self.current_page = page 
+        self.current_page = page
         if page.navigation is not None:
             for nav in page.navigation.breadcrumbs:
                 nav.is_active = True
@@ -217,10 +217,10 @@ class _URLsProcessor(markdown.treeprocessors.Treeprocessor):
             return url_or_path
 
         current_page = self._state.current_page
-        current_directory = os.path.dirname(current_page.source_path)
+        current_directory = os.path.dirname(current_page.path)
 
         referenced_path = os.path.normpath(os.path.join(current_directory, url_or_path))
-        referenced_page = self._site.pages.lookup(source_path=referenced_path)
+        referenced_page = self._site.pages.lookup(path=referenced_path)
         if referenced_page is None:
             return "#"
         return referenced_page.url
