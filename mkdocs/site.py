@@ -41,10 +41,9 @@ class File:
 class Pages:
     all: list["Page"] = field(default_factory=list)
 
-    def lookup(self, source_path: str) -> Optional["Page"]:
-        # TODO: cache
+    def lookup(self, path: str) -> Optional["Page"]:
         for page in self.all:
-            if page.source_path == source_path:
+            if page.path == path:
                 return page
         return None
 
