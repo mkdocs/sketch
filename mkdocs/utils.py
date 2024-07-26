@@ -39,13 +39,6 @@ def list_files_within_directory(directory: str) -> list[str]:
     return filepaths
 
 
-def make_parent_directories(path: str) -> None:
-    """
-    Create all parent directories to the given path, if they do not yet exist.
-    """
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-
-
 def url_for_path(path: str, base_url: str = '/') -> str:
     components = path.split(os.path.sep)
     if components and components[-1] == 'index.html':
