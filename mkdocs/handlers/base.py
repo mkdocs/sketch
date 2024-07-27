@@ -1,4 +1,5 @@
 from ..site import Site
+import flask
 
 
 class Handler:
@@ -6,4 +7,7 @@ class Handler:
         pass
 
     def build(self, site: Site) -> None:
+        pass
+
+    def serve(self, site: Site, url: str) -> flask.Response:
         pass

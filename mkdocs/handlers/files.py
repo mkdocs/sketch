@@ -1,13 +1,12 @@
 import os
 import shutil
-from typing import List
+from typing import List, Optional
 
 from .base import Handler
 from ..site import File, Files, Site
 from ..utils import list_files_within_directory, url_for_path
 
-from starlette.routing import Route
-from starlette.responses import FileResponse
+import flask
 
 
 class StaticFilesHandler(Handler):
@@ -30,12 +29,10 @@ class StaticFilesHandler(Handler):
         for file in site.files:
             self._build_file(file)
 
-    def routes(self, site: Site) -> List[Route]:
-        routes = []
-        for file in site.files:
-            route = self._route_for_file(file)
-            routes.append(route)
-        return routes
+    def serve(self, site: Site, url: str) -> Optional[flask.Response]:
+        file = site.files.lookup_url(url)
+        if file is not None:
+            return self._serve_file(file)
 
     # ...
 
@@ -53,6 +50,6 @@ class StaticFilesHandler(Handler):
         """
         os.makedirs(os.path.dirname(path), exist_ok=True)
 
-    def _route_for_file(self, file: File) -> Route:
+    def _serve_file(self, file: File) -> flask.Response:
         source = os.path.join(self._statics_dir, file.path)
-        return Route(file.url, endpoint=FileResponse(source), methods=['GET'])
+        return flask.send_file(source)

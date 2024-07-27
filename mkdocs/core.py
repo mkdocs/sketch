@@ -4,11 +4,9 @@ from .handlers.pages import PagesHandler
 from .site import Site
 from .utils import merge_dict, load_yaml
 
-from typing import List
-from starlette.routing import Route
-from starlette.applications import Starlette
+from typing import Optional, List
 import click
-import uvicorn
+import flask
 import os
 
 
@@ -49,12 +47,11 @@ class MkDocs:
         for handler in self._handlers:
             handler.build(site)
 
-    def serve(self, site: Site):
-        routes: List[Route] = []
+    def serve(self, site: Site, url: str) -> Optional[flask.Response]:
         for handler in self._handlers:
-            routes.extend(handler.routes(site))
-        app = Starlette(debug=True, routes=routes)
-        uvicorn.run(app)
+            response = handler.serve(site, url)
+            if response is not None:
+                return response
 
 
 @click.group()
@@ -73,4 +70,16 @@ def serve():
     config = load_yaml("mkdocs.yml")
     md = MkDocs(config)
     site = md.initialize()
-    md.serve(site)
+
+    app = flask.Flask(__name__)
+
+    @app.route('/')
+    @app.route('/<path:path>')
+    def endpoint(path=''):
+        url = f'/{path}'
+        response = md.serve(site, url)
+        if response is None:
+            flask.abort(404)
+        return response
+
+    app.run()
