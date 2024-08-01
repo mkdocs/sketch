@@ -1,3 +1,4 @@
+from .handlers.base import Handler
 from .handlers.files import StaticFilesHandler
 from .handlers.navigation import NavigationHandler
 from .handlers.pages import PagesHandler
@@ -28,10 +29,13 @@ DEFAULT_CONFIG = {
 
 class MkDocs:
     def __init__(self, config: dict) -> None:
-        config = merge_dict(config, DEFAULT_CONFIG)
+        config = merge_dict(DEFAULT_CONFIG, config)
         self._url = config['build']['url']
         self._context = config['context']
-        self._handlers = [
+        self._handlers = self.setup_handlers(config)
+
+    def setup_handlers(self, config: dict) -> List[Handler]:
+        return [
             StaticFilesHandler(config),
             PagesHandler(config),
             NavigationHandler(config)
