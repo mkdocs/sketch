@@ -40,7 +40,7 @@ class PagesHandler:
 
     def initialize(self, site: Site) -> None:
         pages = []
-        for path in list_files_within_directory(self._docs_dir):
+        for path in self._list_pages():
             output_path = self._build_path(path)
             url = url_for_path(output_path, base_url=self._base_url)
             page = Page(
@@ -114,6 +114,16 @@ class PagesHandler:
         )
         return markdown_env
 
+    def _list_pages(self) -> List[str]:
+        return list_files_within_directory(self._docs_dir)
+
+    def _load_page(self, page) -> str:
+        source = os.path.join(self._docs_dir, page.path)
+
+        with open(source, "r") as input_file:
+            text = input_file.read()
+        return text
+
     def _build_path(self, source: str) -> str:
         """
         Convert the source path into a destination path.
@@ -135,7 +145,7 @@ class PagesHandler:
         input_rel_path = page.path
         output_rel_path = self._build_path(input_rel_path)
 
-        print(f'Build {input_rel_path!r} -> {output_rel_path!r}')
+        # print(f'Build {input_rel_path!r} -> {output_rel_path!r}')
         input_path = os.path.join(self._docs_dir, input_rel_path)
         output_path = os.path.join(self._build_dir, output_rel_path)
 
@@ -156,10 +166,7 @@ class PagesHandler:
             output_file.write(output_text)
 
     def _serve_page(self, state: BuildState, page: Page, site: Site, template_env: jinja2.Environment, markdown_env: markdown.Markdown) -> flask.Response:
-        source = os.path.join(self._docs_dir, page.path)
-
-        with open(source, "r") as input_file:
-            input_text = input_file.read()
+        input_text = self._load_page(page)
 
         with state.active_page(page):
             page.text = input_text
