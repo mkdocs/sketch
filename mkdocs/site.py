@@ -152,6 +152,7 @@ class NavItem:
 @dataclass
 class Site:
     url: str
+    name: str
     context: dict
     pages: "Pages" = field(default_factory=Pages)
     files: "Files" = field(default_factory=Files)

@@ -14,8 +14,9 @@ import os
 DIRECTORY = os.path.dirname(__file__)
 
 DEFAULT_CONFIG = {
+    'site_name': '',
     'build': {
-        'url': '/'
+        'url': '/',
     },
     'directories': {
         'docs': 'docs',
@@ -31,6 +32,7 @@ class MkDocs:
     def __init__(self, config: dict) -> None:
         config = merge_dict(DEFAULT_CONFIG, config)
         self._url = config['build']['url']
+        self._name = config['site_name']
         self._context = config['context']
         self._handlers = self.setup_handlers(config)
 
@@ -42,7 +44,7 @@ class MkDocs:
         ]
 
     def initialize(self) -> Site:
-        site = Site(url=self._url, context=self._context)
+        site = Site(url=self._url, name=self._name, context=self._context)
         for handler in self._handlers:
             handler.initialize(site)
         return site
